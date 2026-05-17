@@ -17,7 +17,7 @@ export default {
             description:
                 `Current bot version is:\n\n` +
                 `**v${BOT_VERSION}**\n\n` +
-                `This version is manually updated by the developer.`,
+                `This automatically updates the version whenever a change is made.`,
             color: 'info'
         }).setTimestamp();
 
