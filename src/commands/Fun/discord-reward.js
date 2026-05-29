@@ -1,34 +1,39 @@
-async execute(interaction, config, client) {
-  try {
-    // MANUALLY ADDED REWARD CODES
-    const rewardCodes = [
-      "DISCORD-7H2K9",
-      "REWARD-X91PL",
-      "TOKEN-ABCD1",
-      "BONUS-88ZZQ"
-    ];
+{
+  name: 'join-code',
+  description: 'Claim a in game reward in The Handcuff Game',
 
-    // PICK RANDOM CODE
-    const randomCode =
-      rewardCodes[Math.floor(Math.random() * rewardCodes.length)];
+  async execute(interaction, config, client) {
+    try {
+      // MANUALLY ADD YOUR CODES HERE
+      const rewardCodes = [
+        "HANDCUFF-92KF",
+        "REWARD-XP21",
+        "FREECASH-77A",
+        "BONUS-LOCK"
+      ];
 
-    await InteractionHelper.safeReply(interaction, {
-      embeds: [
-        successEmbed(
-          "Discord Reward",
-          `🎉 Your reward code is:\n\`${randomCode}\``
-        )
-      ],
-      ephemeral: true
-    });
+      // RANDOM CODE
+      const randomCode =
+        rewardCodes[Math.floor(Math.random() * rewardCodes.length)];
 
-    return;
-  } catch (error) {
-    logger.error('Discord reward command error:', error);
+      await InteractionHelper.safeReply(interaction, {
+        embeds: [
+          successEmbed(
+            "🎁 Join Reward",
+            `Claim this code in **The Handcuff Game**:\n\n\`${randomCode}\``
+          )
+        ],
+        ephemeral: true
+      });
 
-    await handleInteractionError(interaction, error, {
-      commandName: 'discord_reward',
-      source: 'discord_reward_command'
-    });
-  }
-},
+      return;
+    } catch (error) {
+      logger.error('Join-code command error:', error);
+
+      await handleInteractionError(interaction, error, {
+        commandName: 'join-code',
+        source: 'join_code_command'
+      });
+    }
+  },
+}
