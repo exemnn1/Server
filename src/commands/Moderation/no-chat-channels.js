@@ -1,11 +1,11 @@
 import {
-    ChannelType,
-    PermissionsBitField
+    SlashCommandBuilder,
+    PermissionFlagsBits
 } from 'discord.js';
 
 const VERIFIED_ROLE_ID = '1404325379409444937';
 
-// CONFIGURE DEFAULT VERIFIED PERMISSIONS HERE
+// CONFIGURE VERIFIED ROLE PERMISSIONS HERE
 const VERIFIED_PERMISSIONS = {
     ViewChannel: true,
     SendMessages: true,
@@ -24,46 +24,51 @@ const VERIFIED_PERMISSIONS = {
 };
 
 export default {
-    name: 'ready',
-    once: true,
+    data: new SlashCommandBuilder()
+        .setName('setup-verified')
+        .setDescription('Sync verified role permissions to all channels')
+        .setDefaultMemberPermissions(
+            PermissionFlagsBits.Administrator
+        ),
 
-    async execute(client) {
+    category: 'administration',
 
-        console.log('Setting verified permissions...');
+    async execute(interaction) {
 
-        for (const guild of client.guilds.cache.values()) {
+        await interaction.reply({
+            content: '🔄 Syncing verified permissions...',
+            ephemeral: true
+        });
+
+        let updated = 0;
+        let failed = 0;
+
+        for (const channel of interaction.guild.channels.cache.values()) {
 
             try {
 
-                // LOOP THROUGH ALL CHANNELS
-                for (const channel of guild.channels.cache.values()) {
+                if (!channel.permissionOverwrites) continue;
 
-                    // SKIP DMS / INVALID CHANNELS
-                    if (!channel.permissionOverwrites) continue;
-
-                    // APPLY ROLE PERMISSIONS
-                    await channel.permissionOverwrites.edit(
-                        VERIFIED_ROLE_ID,
-                        VERIFIED_PERMISSIONS
-                    ).catch(console.error);
-
-                    console.log(
-                        `Updated: ${guild.name} -> ${channel.name}`
-                    );
-                }
-
-                console.log(
-                    `Finished configuring ${guild.name}`
+                await channel.permissionOverwrites.edit(
+                    VERIFIED_ROLE_ID,
+                    VERIFIED_PERMISSIONS
                 );
+
+                updated++;
 
             } catch (err) {
-                console.error(
-                    `Failed in guild ${guild.name}:`,
-                    err
-                );
+
+                console.error(err);
+                failed++;
+
             }
         }
 
-        console.log('All verified permissions configured.');
+        await interaction.editReply({
+            content:
+                `✅ Finished syncing verified permissions.\n\n` +
+                `Updated Channels: ${updated}\n` +
+                `Failed: ${failed}`
+        });
     }
 };
